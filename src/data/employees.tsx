@@ -22,10 +22,8 @@ export interface Employee {
   name: string
   avatar: string
   role: string
-  progress: number
   nextCertificate: {
     name: string
-    progress: number
   }
   modules: Module[]
   skills: Skill[]
@@ -37,48 +35,17 @@ export const employees: Employee[] = [
     name: "Alex Johnson",
     avatar: AlexJohnson,
     role: "Customer Service Representative",
-    progress: 65,
     nextCertificate: {
-      name: "Advanced Customer Service",
-      progress: 65
+      name: "Advanced Customer Service"
     },
     modules: [
-      { 
-        id: 1, 
-        name: "Customer Service Fundamentals", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 2, 
-        name: "Communication Excellence", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 3, 
-        name: "Problem-Solving Techniques", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 4, 
-        name: "Advanced Communication Strategies", 
-        progress: 65, 
-        completed: false
-      },
-      { 
-        id: 5, 
-        name: "Customer Experience Design", 
-        progress: 45, 
-        completed: false
-      },
-      { 
-        id: 6, 
-        name: "Service Recovery Excellence", 
-        progress: 30, 
-        completed: false
-      }
+      // Each module is ~16.67% of the certificate.
+      { id: 1, name: "Customer Service Fundamentals", progress: 100, completed: true },
+      { id: 2, name: "Communication Excellence", progress: 100, completed: true },
+      { id: 3, name: "Problem-Solving Techniques", progress: 100, completed: true },
+      { id: 4, name: "Advanced Communication Strategies", progress: 90, completed: false },
+      { id: 5, name: "Customer Experience Design", progress: 0, completed: false },
+      { id: 6, name: "Service Recovery Excellence", progress: 0, completed: false }
     ],
     skills: [
       { name: "Performance Coaching", icon: <Shield className="h-4 w-4" /> },
@@ -97,48 +64,18 @@ export const employees: Employee[] = [
     name: "Sarah Miller",
     avatar: SarahMiller,
     role: "Call Center Supervisor",
-    progress: 85,
     nextCertificate: {
-      name: "Advanced Leadership",
-      progress: 85
+      name: "Advanced Leadership"
     },
     modules: [
-      { 
-        id: 1, 
-        name: "Leadership Fundamentals", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 2, 
-        name: "Team Management", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 3, 
-        name: "Strategic Planning", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 4, 
-        name: "Advanced Team Dynamics", 
-        progress: 85, 
-        completed: false
-      },
-      { 
-        id: 5, 
-        name: "Change Management", 
-        progress: 75, 
-        completed: false
-      },
-      { 
-        id: 6, 
-        name: "Organizational Leadership", 
-        progress: 60, 
-        completed: false
-      }
+      // 85/16.67 ≈ 5.1 so five modules are complete.
+      { id: 1, name: "Leadership Fundamentals", progress: 100, completed: true },
+      { id: 2, name: "Team Management", progress: 100, completed: true },
+      { id: 3, name: "Strategic Planning", progress: 100, completed: true },
+      { id: 4, name: "Advanced Team Dynamics", progress: 100, completed: true },
+      { id: 5, name: "Change Management", progress: 100, completed: true },
+      // Remaining progress for module 6: 85 - (5*16.67) ≈ 1.67, i.e. (1.67/16.67)*100 ≈ 10%.
+      { id: 6, name: "Organizational Leadership", progress: 10, completed: false }
     ],
     skills: [
       { name: "Team Building", icon: <Shield className="h-4 w-4" /> },
@@ -157,48 +94,18 @@ export const employees: Employee[] = [
     name: "Michael Chen",
     avatar: MichaelChen,
     role: "Call Center Quality Analyst",
-    progress: 40,
     nextCertificate: {
-      name: "Advanced Analytics",
-      progress: 40
+      name: "Advanced Analytics"
     },
     modules: [
-      { 
-        id: 1, 
-        name: "Data Analysis Basics", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 2, 
-        name: "Statistical Methods", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 3, 
-        name: "Data Visualization", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 4, 
-        name: "Advanced Statistical Analysis", 
-        progress: 40, 
-        completed: false
-      },
-      { 
-        id: 5, 
-        name: "Predictive Modeling", 
-        progress: 25, 
-        completed: false
-      },
-      { 
-        id: 6, 
-        name: "Business Intelligence", 
-        progress: 15, 
-        completed: false
-      }
+      // 40/16.67 ≈ 2.4 so first two modules are complete.
+      { id: 1, name: "Data Analysis Basics", progress: 100, completed: true },
+      { id: 2, name: "Statistical Methods", progress: 100, completed: true },
+      // Module 3 gets the remaining: 40 - (2*16.67) ≈ 6.67, i.e. (6.67/16.67)*100 ≈ 40%.
+      { id: 3, name: "Data Visualization", progress: 40, completed: false },
+      { id: 4, name: "Advanced Statistical Analysis", progress: 0, completed: false },
+      { id: 5, name: "Predictive Modeling", progress: 0, completed: false },
+      { id: 6, name: "Business Intelligence", progress: 0, completed: false }
     ],
     skills: [
       { name: "Data Analysis", icon: <Target className="h-4 w-4" /> },
@@ -217,48 +124,18 @@ export const employees: Employee[] = [
     name: "Emily Rodriguez",
     avatar: EmilyRodriguez,
     role: "Technical Support Agent",
-    progress: 75,
     nextCertificate: {
-      name: "Advanced Technical Support",
-      progress: 75
+      name: "Advanced Technical Support"
     },
     modules: [
-      { 
-        id: 1, 
-        name: "Technical Support Basics", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 2, 
-        name: "Troubleshooting Methods", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 3, 
-        name: "Customer Communication", 
-        progress: 100, 
-        completed: true
-      },
-      { 
-        id: 4, 
-        name: "Advanced Troubleshooting", 
-        progress: 75, 
-        completed: false
-      },
-      { 
-        id: 5, 
-        name: "System Architecture", 
-        progress: 60, 
-        completed: false
-      },
-      { 
-        id: 6, 
-        name: "Technical Documentation", 
-        progress: 45, 
-        completed: false
-      }
+      // 75/16.67 ≈ 4.5 so first four modules are complete.
+      { id: 1, name: "Technical Support Basics", progress: 100, completed: true },
+      { id: 2, name: "Troubleshooting Methods", progress: 100, completed: true },
+      { id: 3, name: "Customer Communication", progress: 100, completed: true },
+      { id: 4, name: "Advanced Troubleshooting", progress: 100, completed: true },
+      // Module 5: remaining progress = 75 - (4*16.67) ≈ 8.33, i.e. (8.33/16.67)*100 ≈ 50%.
+      { id: 5, name: "System Architecture", progress: 50, completed: false },
+      { id: 6, name: "Technical Documentation", progress: 0, completed: false }
     ],
     skills: [
       { name: "Team Leadership", icon: <Crown className="h-4 w-4" /> },
@@ -272,4 +149,4 @@ export const employees: Employee[] = [
       { name: "Experience Optimization", icon: <Book className="h-4 w-4" /> },
     ],
   },
-] 
+]
