@@ -15,8 +15,7 @@ export function EmployeeCard({ employee }: { employee: Employee }) {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-      onClick={() => navigate(`/employee/${employee.id}`)}
+      className="overflow-hidden hover:shadow-md transition-shadow"
     >
       <CardHeader className="p-4 pb-0">
         <div className="flex items-start justify-between">
@@ -60,7 +59,7 @@ export function EmployeeCard({ employee }: { employee: Employee }) {
         </div>
         <Button 
           variant="outline" 
-          className="w-full"
+          className="w-full cursor-pointer"
           onClick={(e) => {
             e.stopPropagation()
             navigate(`/employee/${employee.id}`)
