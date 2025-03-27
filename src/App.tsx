@@ -1,20 +1,9 @@
-import { Button } from "@/components/ui/button"
+import Dashboard from "@/pages/dashboard"
 
 function App() {
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <Button variant="default">
-        Primary
-      </Button>
-      <Button variant="secondary">
-        Secondary  
-      </Button>
-      <Button variant="destructive">
-        Destructive
-      </Button>
-      <Button variant="ghost">
-        Muted
-      </Button>
+    <div>
+      <Dashboard />
     </div>
   )
 }
