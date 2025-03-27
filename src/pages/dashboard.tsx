@@ -29,7 +29,7 @@ export default function Dashboard() {
             <TabsContent value="active" className="mt-0">
               <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {employees
-                  .filter((employee) => employee.courses.some((course) => !course.completed))
+                  .filter((employee) => employee.modules.some((module) => !module.completed))
                   .map((employee) => (
                     <EmployeeCard key={employee.id} employee={employee} />
                   ))}
@@ -38,7 +38,7 @@ export default function Dashboard() {
             <TabsContent value="completed" className="mt-0">
               <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {employees
-                  .filter((employee) => employee.courses.some((course) => course.completed))
+                  .filter((employee) => employee.modules.some((module) => module.completed))
                   .map((employee) => (
                     <EmployeeCard key={employee.id} employee={employee} />
                   ))}
