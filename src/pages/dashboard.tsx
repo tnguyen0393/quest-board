@@ -2,12 +2,10 @@ import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { employees } from "@/data/employees.tsx"
 import { EmployeeCard } from "@/components/employee-card"
 import { Footer } from "@/components/footer"
-import { Header } from "@/components/header"
 
 export default function Dashboard() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
+    <div className="flex flex-col">
       <main className="flex-1 p-4 md:p-6">
         <section className="flex flex-col gap-4 md:gap-8">
           <header className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
