@@ -10,7 +10,6 @@ import {
   Lightbulb,
   ThumbsUp,
   Frown,
-  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,7 +22,6 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { employees, Module } from "@/data/employees"
-import { generateReviewAdvice } from "@/lib/openai"
 
 export default function EmployeeScorecard() {
   const { id } = useParams()
@@ -36,31 +34,42 @@ export default function EmployeeScorecard() {
     { id: 4, description: "Reduce average call handling time by 10%", completed: false },
   ])
 
-  const [summary, setSummary] = useState(
-    "I've made significant progress this quarter in developing my communication skills and customer service expertise. Completing the Customer Service Fundamentals certification has helped me better understand customer needs and improve satisfaction ratings. I've enjoyed mentoring two junior team members, which has strengthened my leadership abilities. I'm still working on completing the Advanced Customer Service certification and developing more efficient problem-solving techniques to reduce call handling time.",
-  )
+  const [summary, setSummary] = useState("")
 
   const [editingSummary, setEditingSummary] = useState(false)
   const [newGoal, setNewGoal] = useState("")
 
   const [selfReflection, setSelfReflection] = useState({
-    achievements:
-      "Successfully completed three certification modules with perfect scores. Received five customer commendations for exceptional service. Reduced average call handling time by 8% so far.",
-    challenges:
-      "Finding time to balance regular work duties with training modules. Some of the advanced communication concepts have been challenging to implement consistently.",
-    learnings:
-      "The Problem-Solving Techniques module changed how I approach difficult customer situations. I've learned to ask better questions and identify root causes more quickly.",
-    nextSteps:
-      "Complete the Advanced Communication Strategies module by the end of next month. Practice the new conflict resolution techniques with at least 10 challenging customer interactions.",
-    support:
-      "Would benefit from shadowing sessions with senior team members. Additional practice scenarios for the more complex customer situations would be helpful.",
+    achievements: "",
+    challenges: "",
+    learnings: "",
+    nextSteps: "",
+    support: "",
   })
-
-  const [reviewAdvice, setReviewAdvice] = useState<string>("")
-  const [isGeneratingAdvice, setIsGeneratingAdvice] = useState(false)
 
   // Find the selected employee
   const selectedEmployee = employees.find((emp) => emp.id === selectedEmployeeId) || employees[0]
+
+  // Update self-reflection and summary when employee changes
+  useEffect(() => {
+    if (selectedEmployee) {
+      // Generate unique summary based on employee role and certificate
+      const certificateProgress = calculateCertificateProgress(selectedEmployee.modules)
+      const completedModules = selectedEmployee.modules.filter(m => m.completed).length
+      const totalModules = selectedEmployee.modules.length
+      
+      setSummary(`${selectedEmployee.name} has made significant progress in their ${selectedEmployee.nextCertificate.name} certification journey. With ${completedModules} out of ${totalModules} modules completed (${certificateProgress}% overall progress), they have demonstrated strong commitment to professional development. Their expertise in ${selectedEmployee.skills.slice(0, 3).map(s => s.name).join(", ")} has been particularly valuable in their role as ${selectedEmployee.role}.`)
+
+      // Generate unique self-reflection based on employee role and skills
+      setSelfReflection({
+        achievements: `Successfully completed ${completedModules} modules in the ${selectedEmployee.nextCertificate.name} certification program. Demonstrated excellence in ${selectedEmployee.skills.slice(0, 2).map(s => s.name).join(" and ")}.`,
+        challenges: `Balancing ${selectedEmployee.nextCertificate.name} certification work with daily ${selectedEmployee.role} responsibilities. Mastering advanced concepts in ${selectedEmployee.modules.find(m => !m.completed)?.name || "upcoming modules"}.`,
+        learnings: `Gained valuable insights in ${selectedEmployee.modules.filter(m => m.completed).map(m => m.name).join(", ")}. Developed stronger ${selectedEmployee.skills.slice(0, 2).map(s => s.name).join(" and ")} capabilities.`,
+        nextSteps: `Complete remaining modules in ${selectedEmployee.nextCertificate.name} certification. Focus on applying ${selectedEmployee.modules.find(m => !m.completed)?.name || "new"} concepts in daily work.`,
+        support: `Would benefit from mentorship in ${selectedEmployee.modules.find(m => !m.completed)?.name || "advanced topics"}. Additional practice opportunities for ${selectedEmployee.skills.slice(-2).map(s => s.name).join(" and ")} would be valuable.`
+      })
+    }
+  }, [selectedEmployee])
 
   // Handle employee selection change
   const handleEmployeeChange = (value: string) => {
@@ -108,23 +117,6 @@ export default function EmployeeScorecard() {
   const calculateCertificateProgress = (modules: Module[]) => {
     const totalProgress = modules.reduce((sum, module) => sum + module.progress, 0)
     return Math.round(totalProgress / modules.length)
-  }
-
-  const handleGenerateAdvice = async () => {
-    try {
-      setIsGeneratingAdvice(true)
-      const advice = await generateReviewAdvice({
-        ...selectedEmployee,
-        goals,
-        selfReflection,
-      })
-      setReviewAdvice(advice)
-    } catch (error) {
-      console.error('Error generating review advice:', error)
-      setReviewAdvice("Unable to generate review advice at this time. Please try again later.")
-    } finally {
-      setIsGeneratingAdvice(false)
-    }
   }
 
   return (
@@ -390,53 +382,6 @@ export default function EmployeeScorecard() {
               </div>
             </div>
           </CardFooter>
-        </Card>
-
-        {/* Review Presentation Advice */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-yellow-500" />
-                  Review Presentation Guide
-                </CardTitle>
-                <CardDescription>Get personalized advice on presenting your growth and achievements</CardDescription>
-              </div>
-              <Button 
-                onClick={handleGenerateAdvice}
-                disabled={isGeneratingAdvice}
-                className="gap-2"
-              >
-                {isGeneratingAdvice ? (
-                  <>
-                    <span className="animate-spin">⚡</span>
-                    Generating Advice...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    Generate Advice
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {reviewAdvice ? (
-              <div className="prose prose-sm max-w-none">
-                {reviewAdvice.split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 last:mb-0">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-center py-4">
-                Click the button above to get personalized advice on how to present your growth and achievements in your review.
-              </p>
-            )}
-          </CardContent>
         </Card>
       </div>
     </div>
