@@ -10,6 +10,7 @@ import {
   Lightbulb,
   ThumbsUp,
   Frown,
+  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,6 +23,7 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { employees, Module } from "@/data/employees"
+import { generatePerformanceReviewGuidance } from "@/lib/openai"
 
 export default function EmployeeScorecard() {
   const { id } = useParams()
@@ -47,12 +49,18 @@ export default function EmployeeScorecard() {
     support: "",
   })
 
+  const [performanceGuidance, setPerformanceGuidance] = useState("")
+  const [isGeneratingGuidance, setIsGeneratingGuidance] = useState(false)
+
   // Find the selected employee
   const selectedEmployee = employees.find((emp) => emp.id === selectedEmployeeId) || employees[0]
 
   // Update self-reflection and summary when employee changes
   useEffect(() => {
     if (selectedEmployee) {
+      // Reset performance guidance when employee changes
+      setPerformanceGuidance("")
+      
       // Generate unique summary based on employee role and certificate
       const certificateProgress = calculateCertificateProgress(selectedEmployee.modules)
       const completedModules = selectedEmployee.modules.filter(m => m.completed).length
@@ -117,6 +125,24 @@ export default function EmployeeScorecard() {
   const calculateCertificateProgress = (modules: Module[]) => {
     const totalProgress = modules.reduce((sum, module) => sum + module.progress, 0)
     return Math.round(totalProgress / modules.length)
+  }
+
+  const handleGenerateGuidance = async () => {
+    try {
+      setIsGeneratingGuidance(true)
+      const guidance = await generatePerformanceReviewGuidance({
+        ...selectedEmployee,
+        goals,
+        selfReflection,
+        summary,
+      })
+      setPerformanceGuidance(guidance)
+    } catch (error) {
+      console.error('Error generating performance guidance:', error)
+      setPerformanceGuidance("Failed to generate performance review guidance. Please try again.")
+    } finally {
+      setIsGeneratingGuidance(false)
+    }
   }
 
   return (
@@ -382,6 +408,37 @@ export default function EmployeeScorecard() {
               </div>
             </div>
           </CardFooter>
+        </Card>
+
+        {/* Performance Review Guidance */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Performance Review Guidance</CardTitle>
+                <CardDescription>AI-powered guidance for presenting your growth</CardDescription>
+              </div>
+              <Button 
+                onClick={handleGenerateGuidance} 
+                disabled={isGeneratingGuidance}
+                className="flex items-center gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                {isGeneratingGuidance ? "Generating..." : "Generate Guidance"}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {performanceGuidance ? (
+              <div className="prose prose-sm max-w-none">
+                <div className="whitespace-pre-wrap">{performanceGuidance}</div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Click the button above to generate personalized performance review guidance based on your progress and achievements.
+              </div>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>

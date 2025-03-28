@@ -85,4 +85,60 @@ export async function generateGrowthSummary(employee: {
     console.error('Error generating growth summary:', error);
     throw error;
   }
+}
+
+export async function generatePerformanceReviewGuidance(employee: {
+  name: string;
+  role: string;
+  nextCertificate: { name: string };
+  modules: { name: string; progress: number; completed: boolean }[];
+  skills: { name: string }[];
+  goals: { description: string; completed: boolean }[];
+  selfReflection: {
+    achievements: string;
+    challenges: string;
+    learnings: string;
+    nextSteps: string;
+    support: string;
+  };
+  summary: string;
+}) {
+  try {
+    const prompt = `Generate personalized performance review guidance for ${employee.name}, a ${employee.role} who is pursuing their ${employee.nextCertificate.name} certificate.
+
+Current Status:
+- Certificate Progress: ${Math.round(employee.modules.reduce((sum, m) => sum + m.progress, 0) / employee.modules.length)}%
+- Completed Modules: ${employee.modules.filter(m => m.completed).map(m => m.name).join(", ")}
+- Key Skills: ${employee.skills.map(s => s.name).join(", ")}
+- Goals: ${employee.goals.map(g => `${g.description} (${g.completed ? "Completed" : "In Progress"})`).join(", ")}
+- Self-Reflection Summary: ${employee.summary}
+
+Self-Reflection Details:
+- Achievements: ${employee.selfReflection.achievements}
+- Challenges: ${employee.selfReflection.challenges}
+- Learnings: ${employee.selfReflection.learnings}
+- Next Steps: ${employee.selfReflection.nextSteps}
+- Support Needed: ${employee.selfReflection.support}
+
+Please provide a structured guide with bullet points on how to present their growth in a performance review. Focus on:
+1. Key achievements to highlight
+2. Specific skills and competencies to emphasize
+3. Areas of growth and development
+4. Future potential and career trajectory
+5. Specific examples to support each point
+
+Make the guidance specific to their role, skills, and actual achievements. Avoid generic advice.`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 500,
+      temperature: 0.7,
+    });
+    
+    return completion.choices[0].message.content || '';
+  } catch (error) {
+    console.error('Error generating performance review guidance:', error);
+    throw error;
+  }
 } 
