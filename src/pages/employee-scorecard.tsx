@@ -10,6 +10,7 @@ import {
   Lightbulb,
   ThumbsUp,
   Frown,
+  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,6 +23,7 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { employees, Module } from "@/data/employees"
+import { generateReviewAdvice } from "@/lib/openai"
 
 export default function EmployeeScorecard() {
   const { id } = useParams()
@@ -53,6 +55,9 @@ export default function EmployeeScorecard() {
     support:
       "Would benefit from shadowing sessions with senior team members. Additional practice scenarios for the more complex customer situations would be helpful.",
   })
+
+  const [reviewAdvice, setReviewAdvice] = useState<string>("")
+  const [isGeneratingAdvice, setIsGeneratingAdvice] = useState(false)
 
   // Find the selected employee
   const selectedEmployee = employees.find((emp) => emp.id === selectedEmployeeId) || employees[0]
@@ -103,6 +108,23 @@ export default function EmployeeScorecard() {
   const calculateCertificateProgress = (modules: Module[]) => {
     const totalProgress = modules.reduce((sum, module) => sum + module.progress, 0)
     return Math.round(totalProgress / modules.length)
+  }
+
+  const handleGenerateAdvice = async () => {
+    try {
+      setIsGeneratingAdvice(true)
+      const advice = await generateReviewAdvice({
+        ...selectedEmployee,
+        goals,
+        selfReflection,
+      })
+      setReviewAdvice(advice)
+    } catch (error) {
+      console.error('Error generating review advice:', error)
+      setReviewAdvice("Unable to generate review advice at this time. Please try again later.")
+    } finally {
+      setIsGeneratingAdvice(false)
+    }
   }
 
   return (
@@ -368,6 +390,53 @@ export default function EmployeeScorecard() {
               </div>
             </div>
           </CardFooter>
+        </Card>
+
+        {/* Review Presentation Advice */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-yellow-500" />
+                  Review Presentation Guide
+                </CardTitle>
+                <CardDescription>Get personalized advice on presenting your growth and achievements</CardDescription>
+              </div>
+              <Button 
+                onClick={handleGenerateAdvice}
+                disabled={isGeneratingAdvice}
+                className="gap-2"
+              >
+                {isGeneratingAdvice ? (
+                  <>
+                    <span className="animate-spin">⚡</span>
+                    Generating Advice...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    Generate Advice
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {reviewAdvice ? (
+              <div className="prose prose-sm max-w-none">
+                {reviewAdvice.split('\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4 last:mb-0">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">
+                Click the button above to get personalized advice on how to present your growth and achievements in your review.
+              </p>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>

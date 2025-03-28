@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import managerImage from "@/assets/manager.png"
 
 export function UserMenu() {
   return (
@@ -14,8 +15,8 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <img
-            src="/placeholder.svg?height=32&width=32"
-            alt="Avatar"
+            src={managerImage}
+            alt="Manager Avatar"
             className="rounded-full"
           />
           <span className="sr-only">Toggle user menu</span>
