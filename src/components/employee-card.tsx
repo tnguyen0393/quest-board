@@ -4,14 +4,48 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { type Employee, Module } from "@/data/employees.tsx"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { generateGrowthSummary } from "@/lib/openai"
+import { useEffect, useState } from "react"
 
 export function EmployeeCard({ employee }: { employee: Employee }) {
   const navigate = useNavigate()
+  const [growthSummary, setGrowthSummary] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(true)
   
   const calculateCertificateProgress = (modules: Module[]) => {
     const totalProgress = modules.reduce((sum, module) => sum + module.progress, 0)
     return Math.round(totalProgress / modules.length)
   }
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchGrowthSummary = async () => {
+      try {
+        setIsLoading(true)
+        const summary = await generateGrowthSummary(employee)
+        if (isMounted) {
+          setGrowthSummary(summary || '')
+        }
+      } catch (error) {
+        console.error('Error fetching growth summary:', error)
+        if (isMounted) {
+          const fallbackSummary = `${employee.name} is working towards their ${employee.nextCertificate.name} certificate. With ${calculateCertificateProgress(employee.modules)}% completion, they've developed ${employee.skills.length} key skills that enhance their ${employee.role.toLowerCase()} role, including ${employee.skills.slice(0, 3).map(s => s.name).join(", ")}.`
+          setGrowthSummary(fallbackSummary)
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchGrowthSummary()
+
+    return () => {
+      isMounted = false
+    }
+  }, [employee])
 
   return (
     <Card 
@@ -57,6 +91,16 @@ export function EmployeeCard({ employee }: { employee: Employee }) {
             ))}
           </div>
         </div>
+        <div className="w-full">
+          <h4 className="text-sm font-semibold mb-2">Growth Summary</h4>
+          <p className="text-sm text-muted-foreground">
+            {isLoading ? (
+              <span className="animate-pulse">Generating personalized growth summary...</span>
+            ) : (
+              growthSummary
+            )}
+          </p>
+        </div>
         <Button 
           variant="outline" 
           className="w-full cursor-pointer"
@@ -70,4 +114,4 @@ export function EmployeeCard({ employee }: { employee: Employee }) {
       </CardFooter>
     </Card>
   )
-} 
+}
