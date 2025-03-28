@@ -8,7 +8,6 @@ export function Footer() {
           <Shield className="h-6 w-6" />
           <span className="font-bold">QuestBoard</span>
         </div>
-        <p className="ml-auto text-sm text-muted-foreground">© 2025 QuestBoard Inc. All rights reserved.</p>
       </section>
     </footer>
   )
